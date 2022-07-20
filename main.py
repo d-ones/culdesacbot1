@@ -14,3 +14,12 @@ def serve():
     print(prefix + urllib.parse.quote_plus((str(coord))) + suffix)
     
 serve()
+
+# Option for for loop with list
+
+# for line in lines:
+#             print(str(659799 - len(lines)) + ' of 659798')
+#             coord = random.choice(lines)
+#             print(prefix + urllib.parse.quote_plus((str(coord))) + suffix)
+#             lines.remove(coord)
+#             time.sleep(5)
