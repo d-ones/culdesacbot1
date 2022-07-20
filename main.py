@@ -23,8 +23,14 @@ for line in lines:
 
             #Generate Content
 
-            text = (str(659799 - len(lines)) + ' of 659798')
             coord = random.choice(lines)
+            text = coord.split(',')
+            lat = (text[0])
+            lon = str(text[1][:-2])
+            nom = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&zoom=11&format=json'
+            locate = requests.get(nom)
+            json = locate.json()
+            location = json['display_name']
             url = (baseurl + urllib.parse.quote_plus((str(coord))) + posturl + creds.maps_api)
             response = requests.get(url)
             imagesave = f'tempscreenshot{len(lines)}.png'
@@ -34,7 +40,7 @@ for line in lines:
             # Put in Twitter API stuff
 
             image_path = f'tempscreenshot{len(lines)}.png'
-            tweet_text = f'{text}\n{str(coord)}'
+            tweet_text = f'{location}\n{str(coord)}'
             api.update_status_with_media(tweet_text, image_path)
 
             # Delete and sleep
