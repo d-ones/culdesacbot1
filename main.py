@@ -24,7 +24,7 @@ while True:
         random_coord = df.sample(1)  # pick single random sample
         coord_array = random_coord.\
             to_string(header=False, index=False, index_names=False).split(" ")
-        coord_str = ",".join(coord_array)
+        coord_str = " , ".join(coord_array)
         lat: str = coord_array[0]
         lon: str = coord_array[1][:-2]
         nom = \
