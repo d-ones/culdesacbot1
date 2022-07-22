@@ -4,6 +4,7 @@ import requests
 import os
 import tweepy
 import creds
+import random
 
 # Variables
 
@@ -37,7 +38,9 @@ for element in usedlines:
 
 # Start of actual tweeting function
 
-for coord in coordlines:
+for item in coordlines:
+
+    coord = random.choice(coordlines)
 
     try:
 
