@@ -38,9 +38,7 @@ for element in usedlines:
 
 # Start of actual tweeting function
 
-for item in coordlines:
-
-    coord = random.choice(coordlines)
+for coord in coordlines:
 
     try:
 
@@ -67,7 +65,7 @@ for item in coordlines:
         # Twitter API stuff
 
         image_path = f'tempscreenshot{len(coordlines)}.png'
-        tweet_text = f'{location}\n{lat} , {lon}'
+        tweet_text = f'{location}\n{lat}, {lon}'
         api.update_status_with_media(tweet_text, image_path)
 
         # Delete and sleep
@@ -76,7 +74,7 @@ for item in coordlines:
 
         # Don't delete this :-) !
 
-        time.sleep(1800)
+        time.sleep(3600)
 
     except ValueError:
         break
