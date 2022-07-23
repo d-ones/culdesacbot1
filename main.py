@@ -4,7 +4,6 @@ import requests
 import os
 import tweepy
 import creds
-import random
 
 # Variables
 
@@ -13,6 +12,14 @@ auth.set_access_token(creds.access_token, creds.access_secret)
 posturl = '&zoom=20&maptype=satellite&size=640x640&key='
 baseurl = 'https://maps.googleapis.com/maps/api/staticmap?center='
 api = tweepy.API(auth)
+usedfile = '/var/bot/used.txt'
+
+# Check if used works
+
+if not os.path.exists(usedfile):
+    print('Creating Used File')
+    with open(usedfile, 'w'):
+        pass
 
 # Establishing lists
 
@@ -24,55 +31,64 @@ with open('shufflecoords.csv', newline='')as f:
 
 # List of used coordinates
 
-with open('used.txt', 'r') as fd:
+with open(usedfile, 'r') as fd:
     usedrows = fd.readlines()
     usedlines = [usedrow.rstrip() for usedrow in usedrows]
 
 # Removing used from all coords
 
+print(f'Removing used ({len(usedlines)} of {len(coordlines)})')
+
 for element in usedlines:
     if element in coordlines:
         coordlines.remove(element)
 
+print(f'Untweeted: {len(coordlines)}')
+
 # Start of actual tweeting function
+
+print('Beginning')
 
 for coord in coordlines:
 
-    try:
+    print(f'Tweeting {str(coord)}')
 
-        usedlines.append(str(coord))
-        with open('used.txt', 'w') as out:
-            for line in usedlines:
-                out.write(f'{line}\n')
+    # Write used
 
-        #Generate Content
+    with open(usedfile, 'a') as out:
+        out.write(f'{str(coord)}\n')
+    print('Used file updated')
 
-        text = coord.split(',')
-        lat = (text[0])
-        lon = str(text[1])
-        nom = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&zoom=11&format=json'
-        locate = requests.get(nom)
-        json = locate.json()
-        location = json['display_name']
-        url = (baseurl + urllib.parse.quote_plus((str(coord))) + posturl + creds.maps_api)
-        response = requests.get(url)
-        imagesave = f'tempscreenshot{len(coordlines)}.png'
-        with open(f'{imagesave}', 'wb') as image:
-            image.write(response.content)
+    #Generate Content
 
-        # Twitter API stuff
+    text = coord.split(',')
+    lat = (text[0])
+    lon = str(text[1])
+    nom = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&zoom=11&format=json'
+    locate = requests.get(nom)
+    json = locate.json()
+    location = json['display_name']
+    url = (baseurl + urllib.parse.quote_plus((str(coord))) + posturl + creds.maps_api)
+    response = requests.get(url)
+    imagesave = f'tempscreenshot{len(coordlines)}.png'
+    with open(f'{imagesave}', 'wb') as image:
+        image.write(response.content)
+    print('Image saved')
 
-        image_path = f'tempscreenshot{len(coordlines)}.png'
-        tweet_text = f'{location}\n{lat}, {lon}'
-        api.update_status_with_media(tweet_text, image_path)
+    # Twitter API stuff
 
-        # Delete and sleep
+    image_path = f'tempscreenshot{len(coordlines)}.png'
+    tweet_text = f'{location}\n{lat}, {lon}'
+    api.update_status_with_media(tweet_text, image_path)
+    print('Tweet posted')
 
-        os.remove(f'tempscreenshot{len(coordlines)}.png')
+    # Delete and sleep
 
-        # Don't delete this :-) !
+    os.remove(f'tempscreenshot{len(coordlines)}.png')
+    print('Image deleted')
 
-        time.sleep(3600)
+    # Don't delete this :-) !
 
-    except ValueError:
-        break
+    print('Sleeping')
+
+    time.sleep(3600)
