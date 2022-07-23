@@ -21,14 +21,12 @@ api = tweepy.API(auth)
 with open('shufflecoords.csv', newline='')as f:
     coordrows = f.readlines()
     coordlines = [coordrow.rstrip() for coordrow in coordrows]
-    f.close()
 
 # List of used coordinates
 
 with open('used.txt', 'r') as fd:
     usedrows = fd.readlines()
     usedlines = [usedrow.rstrip() for usedrow in usedrows]
-    fd.close()
 
 # Removing used from all coords
 
