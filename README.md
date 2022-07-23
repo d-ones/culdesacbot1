@@ -8,4 +8,4 @@ To replicate, you will need a credentials file with API keys from Twitter and Go
 
 The point data is from the United States Census and the spatial data is from OpenStreetMaps and Google Maps.
 
-Thanks sonarypt (github.com/sonarypt) for their help  
+Thanks sonarypt (github.com/sonarypt) and yerbic (github.com/yerbic) for their help  
