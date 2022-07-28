@@ -91,4 +91,4 @@ for coord in coordlines:
 
     print('Sleeping')
 
-    time.sleep(3600)
+    time.sleep(14400)
