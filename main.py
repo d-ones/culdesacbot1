@@ -18,8 +18,9 @@ usedfile = '/var/bot/used.txt'
 
 if not os.path.exists(usedfile):
     print('Creating Used File')
-    with open(usedfile, 'w'):
-        pass
+    with open(usedfile, 'w') as g:
+        g.write('0')
+
 
 # Establishing lists
 
@@ -27,21 +28,18 @@ if not os.path.exists(usedfile):
 
 with open('shufflecoords.csv', newline='')as f:
     coordrows = f.readlines()
-    coordlines = [coordrow.rstrip() for coordrow in coordrows]
+    coordlinesx = [coordrow.rstrip() for coordrow in coordrows]
 
-# List of used coordinates
+# index of last used coordinates
 
 with open(usedfile, 'r') as fd:
-    usedrows = fd.readlines()
-    usedlines = [usedrow.rstrip() for usedrow in usedrows]
+    usedrows = int(fd.readline())
 
 # Removing used from all coords
 
-print(f'Removing used ({len(usedlines)} of {len(coordlines)})')
+print('Removing used')
 
-for element in usedlines:
-    if element in coordlines:
-        coordlines.remove(element)
+coordlines = coordlinesx[usedrows::]
 
 print(f'Untweeted: {len(coordlines)}')
 
@@ -53,13 +51,16 @@ for coord in coordlines:
 
     print(f'Tweeting {str(coord)}')
 
-    # Write used
+    # Update used
 
-    with open(usedfile, 'a') as out:
-        out.write(f'{str(coord)}\n')
+    usedrows = int(usedrows) + 1
+
+    with open(usedfile, 'w') as out:
+        out.write(str(usedrows))
     print('Used file updated')
 
-    #Generate Content
+
+    # Generate Content
 
     text = coord.split(',')
     lat = (text[0])
