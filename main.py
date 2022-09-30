@@ -12,7 +12,11 @@ auth.set_access_token(creds.access_token, creds.access_secret)
 posturl = '&zoom=20&maptype=satellite&size=640x640&key='
 baseurl = 'https://maps.googleapis.com/maps/api/staticmap?center='
 api = tweepy.API(auth)
-usedfile = '/var/bot/used.txt'
+usedfile = 'used2.txt'
+
+sess = requests.Session()
+adapter = requests.adapters.HTTPAdapter(max_retries=20)
+sess.mount('http://', adapter)
 
 # Check if used works
 
@@ -61,35 +65,39 @@ for coord in coordlines:
 
 
     # Generate Content
+    try:
+        text = coord.split(',')
+        lat = (text[0])
+        lon = str(text[1])
+        nom = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&zoom=11&format=json'
+        locate = sess.get(nom)
+        json = locate.json()
+        location = json['display_name']
+        url = (baseurl + urllib.parse.quote_plus((str(coord))) + posturl + creds.maps_api)
+        response = requests.get(url)
+        imagesave = f'tempscreenshot{len(coordlines)}.png'
+        with open(f'{imagesave}', 'wb') as image:
+            image.write(response.content)
+        print('Image saved')
 
-    text = coord.split(',')
-    lat = (text[0])
-    lon = str(text[1])
-    nom = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&zoom=11&format=json'
-    locate = requests.get(nom)
-    json = locate.json()
-    location = json['display_name']
-    url = (baseurl + urllib.parse.quote_plus((str(coord))) + posturl + creds.maps_api)
-    response = requests.get(url)
-    imagesave = f'tempscreenshot{len(coordlines)}.png'
-    with open(f'{imagesave}', 'wb') as image:
-        image.write(response.content)
-    print('Image saved')
+        # Twitter API stuff
 
-    # Twitter API stuff
+        image_path = f'tempscreenshot{len(coordlines)}.png'
+        tweet_text = f'{location}\n{lat}, {lon}'
+        api.update_status_with_media(tweet_text, image_path)
+        print('Tweet posted')
 
-    image_path = f'tempscreenshot{len(coordlines)}.png'
-    tweet_text = f'{location}\n{lat}, {lon}'
-    api.update_status_with_media(tweet_text, image_path)
-    print('Tweet posted')
+        # Delete and sleep
 
-    # Delete and sleep
+        os.remove(f'tempscreenshot{len(coordlines)}.png')
+        print('Image deleted')
 
-    os.remove(f'tempscreenshot{len(coordlines)}.png')
-    print('Image deleted')
+        # Don't delete this :-) !
 
-    # Don't delete this :-) !
+        print('Sleeping')
 
-    print('Sleeping')
+        time.sleep(14400)
 
-    time.sleep(14400)
+    except Exception as e:
+        print(e.message, e.args)
+        pass
