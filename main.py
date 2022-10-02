@@ -100,4 +100,5 @@ for coord in coordlines:
 
     except Exception as e:
         print(e.message, e.args)
+        time.sleep(1200)
         pass
