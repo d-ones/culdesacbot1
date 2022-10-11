@@ -12,7 +12,7 @@ auth.set_access_token(creds.access_token, creds.access_secret)
 posturl = '&zoom=20&maptype=satellite&size=640x640&key='
 baseurl = 'https://maps.googleapis.com/maps/api/staticmap?center='
 api = tweepy.API(auth)
-usedfile = 'used2.txt'
+usedfile = '/var/bot/used3.txt'
 
 sess = requests.Session()
 adapter = requests.adapters.HTTPAdapter(max_retries=20)
@@ -67,12 +67,14 @@ for coord in coordlines:
     # Generate Content
     try:
         text = coord.split(',')
-        lat = (text[0])
+        lat = str(text[0])
         lon = str(text[1])
-        nom = f'https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&zoom=11&format=json'
-        locate = sess.get(nom)
-        json = locate.json()
-        location = json['display_name']
+        locate = requests.get(f'https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&result_type=locality|administrative_area_level_2&key={creds.maps_api}')
+        locatejson = locate.json()
+        if locatejson['results'][0]['address_components'][0]['types'][0] == 'locality':
+            location = locatejson['results'][0]['address_components'][0]['long_name'] + ', ' + locatejson['results'][1]['formatted_address']
+        else:
+            location = locatejson['results'][0]['formatted_address']
         url = (baseurl + urllib.parse.quote_plus((str(coord))) + posturl + creds.maps_api)
         response = requests.get(url)
         imagesave = f'tempscreenshot{len(coordlines)}.png'
@@ -99,6 +101,6 @@ for coord in coordlines:
         time.sleep(14400)
 
     except Exception as e:
-        print(e.message, e.args)
-        time.sleep(1200)
+        print(e)
+        time.sleep(1800)
         pass
