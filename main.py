@@ -14,10 +14,6 @@ baseurl = 'https://maps.googleapis.com/maps/api/staticmap?center='
 api = tweepy.API(auth)
 usedfile = '/var/bot/used3.txt'
 
-sess = requests.Session()
-adapter = requests.adapters.HTTPAdapter(max_retries=20)
-sess.mount('http://', adapter)
-
 # Check if used works
 
 if not os.path.exists(usedfile):
