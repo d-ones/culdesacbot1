@@ -2,17 +2,20 @@ import time
 import urllib.parse
 import requests
 import os
-import tweepy
+import pytumblr
 import creds
 
 # Variables
 
-auth = tweepy.OAuthHandler(creds.consumer_key, creds.consumer_secret)
-auth.set_access_token(creds.access_token, creds.access_secret)
+client = pytumblr.TumblrRestClient(
+  creds.consumer_key,
+  creds.consumer_secret,
+  creds.access_token,
+  creds.access_secret
+)
 posturl = '&zoom=20&maptype=satellite&size=640x640&key='
 baseurl = 'https://maps.googleapis.com/maps/api/staticmap?center='
-api = tweepy.API(auth)
-usedfile = '/var/bot/used3.txt'
+usedfile = 'used.txt'
 
 # Check if used works
 
@@ -49,7 +52,7 @@ print('Beginning')
 
 for coord in coordlines:
 
-    print(f'Tweeting {str(coord)}')
+    print(f'Posting {str(coord)}')
 
     # Update used
 
@@ -78,19 +81,19 @@ for coord in coordlines:
             image.write(response.content)
         print('Image saved')
 
-        # Twitter API stuff
+        # Twitter... I mean Tumblr API stuff
 
         image_path = f'tempscreenshot{len(coordlines)}.png'
-        tweet_text = f'{location}\n{lat}, {lon}'
-        api.update_status_with_media(tweet_text, image_path)
-        print('Tweet posted')
+        text = f'{location}\n{lat}, {lon}'
+        client.create_photo('culdesacbot1', state="published", tags=["culdesac"],
+                    caption=text,
+                    data=image_path)
+        print('Tumblr post made')
 
         # Delete and sleep
 
         os.remove(f'tempscreenshot{len(coordlines)}.png')
         print('Image deleted')
-
-        # Don't delete this :-) !
 
         print('Sleeping')
 
