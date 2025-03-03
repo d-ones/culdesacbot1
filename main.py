@@ -16,7 +16,7 @@ nextfile = 'next.txt'
 if not os.path.exists(nextfile):
     print('Creating Used File')
     with open(nextfile, 'w') as g:
-        g.write('0')
+        g.write('659798')
 
 with open('shufflecoords.csv', newline='')as f:
     coordrows = f.readlines()
@@ -29,7 +29,7 @@ coord = coordrows[nextindex].rstrip()
 
 print(f'Posting {str(coord)} at index {nextindex}')
 
-next = int(nextindex) + 1
+next = int(nextindex) - 1
 
 with open(nextfile, 'w') as out:
     out.write(str(next))
